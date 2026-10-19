@@ -1,0 +1,18 @@
+(version 1)
+
+# Competition forbids via-in-pad, including same-net overlap.
+(rule "No via copper inside pads"
+  (condition "A.Type == 'Via' && B.Type == 'Pad'")
+  (constraint physical_clearance (min 0.001mm)))
+
+# Through-vias cross both outer faces and must avoid every IC courtyard.
+(rule "No vias within IC courtyards"
+  (condition "A.Type == 'Via' && A.intersectsCourtyard('U*')")
+  (constraint disallow via))
+
+# The supplied unmodified USB footprint has a measured 0.1847 mm internal
+# NPTH-to-pad gap. The challenge specifies no independent hole-to-copper
+# minimum; retain 0.25 mm elsewhere and use 0.18 mm only within J3.
+(rule "Supplied J3 internal hole clearance"
+  (condition "A.memberOfFootprint('J3') && B.memberOfFootprint('J3')")
+  (constraint hole_clearance (min 0.18mm)))
